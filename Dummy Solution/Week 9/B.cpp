@@ -1,56 +1,49 @@
-#include <bits/stdc++.h>
+#include "bits/stdc++.h"
 
 using namespace std;
 
-int run();
-
-int main() {
-#ifdef home
-  freopen("i", "r", stdin);
-  freopen("d", "w", stderr);
-#endif
-  cout.precision(15);
-
-  ios::sync_with_stdio(false);
-  cin.tie(nullptr);
-  cout.tie(nullptr);
-
-  run();
+void solve() {
+    int n;
+    cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) {
+        cin >> a[i];
+    }
+    vector<vector<int>> dp(n, vector<int> (n));
+    for (int l = n - 1; l >= 0; l--) {
+        for (int r = l; r < n; r++) {
+            if (l == r) {
+                dp[l][r] = a[l];
+                continue;
+            }
+            dp[l][r] = max(dp[l][r - 1], dp[l + 1][r]);
+            int len = r - l, res = 0;
+            for (int msk = len; ; msk = (msk - 1) & len) {
+                res ^= a[l + msk];
+                if (msk == 0) {
+                    break;
+                }
+            }
+            dp[l][r] = max(dp[l][r], res);
+        }
+    }
+    int q;
+    cin >> q;
+    while (q--) {
+        int l, r;
+        cin >> l >> r;
+        l--, r--;
+        cout << dp[l][r] << '\n';
+    }
 }
 
-const int N = 5000;
-
-int a[N];
-
-int dp[N][N];
-
-int run() {
-  int n;
-  cin >> n;
-  for (int i = 0; i < n; i++) {
-    cin >> a[i];
-    dp[0][i] = a[i];
-  }
-  for (int i = 1; i < n; i++) {
-    for (int j = 0; j <= n - i; j++) {
-      dp[i][j] = dp[i - 1][j + 1] ^ dp[i - 1][j];
+int main() {
+    ios_base::sync_with_stdio(0);
+    cin.tie(0);
+    cout.tie(0);
+    int q;
+    q = 1;
+    while (q--) {
+        solve();
     }
-  }
-
-  for (int i = 1; i < n; i++) {
-    for (int j = 0; j < n - i; j++) {
-      dp[i][j] = max({dp[i][j], dp[i - 1][j], dp[i - 1][j + 1]});
-    }
-  }
-
-  int q;
-  cin >> q;
-
-  for (int i = 0; i < q; i++) {
-    int l, r;
-    cin >> l >> r;
-    --l;
-    int len = r - l - 1;
-    cout << dp[len][l] << '\n';
-  }
 }
