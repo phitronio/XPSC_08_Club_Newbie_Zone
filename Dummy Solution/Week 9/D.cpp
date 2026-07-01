@@ -1,162 +1,41 @@
-#include <bits/stdc++.h>
-
+#include<bits/stdc++.h>
+#define f(i,x,y) for(int i=x;i<=y;i++)
+#define pb push_back
+#define lb lower_bound
+#define mid (l+r)/2
+#define L k*2
+#define R k*2+1
+#define ls L,l,mid
+#define rs R,mid+1,r
 using namespace std;
-
-namespace solution {
-int run();
+const int N=2e6+9;
+int n,w,a[N],b[N],c[N],d[N],vx[N],vy[N],xl,yl,x,y,z,mx[N],mn[N],v[N],as;
+vector<int>q[N];set<int>s[N];
+void PU(int k)
+{
+	mn[k]=min(mn[L],mn[R]);mx[k]=max(mx[L],mx[R]);
+	if(!s[k].empty()){w=*s[k].rbegin();if(v[w])mn[k]=max(mn[k],w);else mx[k]=max(mx[k],w);}
+	if(mx[k]<mn[k])mx[k]=0;
 }
-
-int main() {
-#ifdef home
-  freopen("i", "r", stdin);
-  freopen("d", "w", stderr);
-#endif
-  cout.precision(15);
-
-  ios::sync_with_stdio(false);
-  cin.tie(nullptr);
-  cout.tie(nullptr);
-
-  solution::run();
-}
-namespace solution {
-
-const int SZ = 1500500;
-
-const int N = 100500;
-
-int x1[N], x2[N], y1[N], y2[N];
-
-bool erased[N];
-
-priority_queue<int> els[SZ];
-
-int mn[SZ];
-int mx[SZ];
-
-bool seen[N];
-
-enum {
-  ACTION_ADD,
-  ACTION_ERASE,
-  ACTION_VOID
-};
-
-void recalc(int cur) {
-  int max_in_child = max(mx[cur * 2], mx[cur * 2 + 1]);
-
-  while (!els[cur].empty() && erased[els[cur].top()]) {
-    els[cur].pop();
-  }
-
-  int max_in_vertex = els[cur].empty() ? -1 : els[cur].top();
-  int min_in_child = min(mn[cur * 2], mn[cur * 2 + 1]);
-
-  if (max_in_vertex > max_in_child) {
-    if (seen[max_in_vertex] || max_in_vertex < min_in_child) {
-      mx[cur] = -1;
-    } else {
-      mx[cur] = max_in_vertex;
-    }
-  } else {
-    mx[cur] = max_in_child;
-  }
-  mn[cur] = max(max_in_vertex, min_in_child);
-}
-
-void add(int cur, int lb, int rb, int id, int action, int l = 0, int r = 2 * N) {
-  if (lb >= r || rb <= l) {
-    return;
-  }
-
-  if (lb <= l && rb >= r) {
-    if (action == ACTION_ADD) {
-      els[cur].push(id);
-    }
-
-    recalc(cur);
-    return;
-  }
-
-  int mid = (l + r) / 2;
-
-  add(cur * 2, lb, rb, id, action, l, mid);
-  add(cur * 2 + 1, lb, rb, id, action, mid, r);
-
-  recalc(cur);
-}
-
-set<int> cx, cy;
-
-unordered_map<int, int> id_x, id_y;
-
-vector<pair<int, int> > events[2 * N];
-
-int run() {
-  int n;
-  cin >> n;
-  for (int i = 0; i < n; i++) {
-    cin >> x1[i] >> y1[i] >> x2[i] >> y2[i];
-
-    cx.insert(x1[i]);
-    cx.insert(x2[i]);
-
-    cy.insert(y1[i]);
-    cy.insert(y2[i]);
-  }
-
-  int j = 0;
-  for (auto x : cx) {
-    id_x[x] = j++;
-  }
-
-  j = 0;
-  for (auto y : cy) {
-    id_y[y] = j++;
-  }
-
-  for (int i = 0; i < n; i++) {
-    x1[i] = id_x[x1[i]];
-    x2[i] = id_x[x2[i]];
-
-    y1[i] = id_y[y1[i]];
-    y2[i] = id_y[y2[i]];
-
-    events[x1[i]].push_back({i, ACTION_ADD});
-
-    events[x2[i]].push_back({i, ACTION_ERASE});
-  }
-
-  for (int i = 0; i < SZ; i++) {
-    mx[i] = -1;
-  }
-
-  int cnt_x = id_x.size();
-
-  for (int i = 0; i < cnt_x; i++) {
-    for (auto e : events[i]) {
-      int id = e.first;
-      int action = e.second;
-      if (action == ACTION_ERASE) {
-        erased[id] = true;
-      }
-      add(1, y1[id], y2[id], id, action);
-    }
-    while (mx[1] >= mn[1]) {
-      int id = mx[1];
-      seen[id] = true;
-      add(1, y1[id], y2[id], id, ACTION_VOID);
-    }
-  }
-
-  int ans = 1;
-  for (int i = 0; i < n; i++) {
-    if (seen[i]) {
-      ans++;
-    }
-  }
-  cout << ans;
-
-}
-return 0;
+void C(int k,int l,int r)
+{
+	if(x<=l&&r<=y){if(z)if(s[k].count(z))s[k].erase(z);else s[k].insert(z);PU(k);return;}
+	if(x<=mid)C(ls);if(mid<y)C(rs);PU(k);
+} 
+signed main()
+{
+	scanf("%d",&n);
+	f(i,1,n)scanf("%d%d%d%d",&a[i],&b[i],&c[i],&d[i]),vx[++xl]=a[i],vx[++xl]=c[i],vy[++yl]=b[i],vy[++yl]=d[i];
+	sort(vx+1,vx+xl+1);xl=unique(vx+1,vx+xl+1)-vx-1;sort(vy+1,vy+yl+1);yl=unique(vy+1,vy+yl+1)-vy-1;
+	f(i,1,n)
+	a[i]=lb(vx+1,vx+xl+1,a[i])-vx,c[i]=lb(vx+1,vx+xl+1,c[i])-vx,
+	b[i]=lb(vy+1,vy+yl+1,b[i])-vy,d[i]=lb(vy+1,vy+yl+1,d[i])-vy-1,
+	q[a[i]].pb(i),q[c[i]].pb(i);
+	f(i,1,xl)
+	{
+		for(int j:q[i])x=b[j],y=d[j],z=j,C(1,1,yl);
+		while(mx[1])++as,v[w=mx[1]]=1,x=b[w],y=d[w],z=0,C(1,1,yl);
+	}
+	cout<<as+1;
+	return 0;
 }
