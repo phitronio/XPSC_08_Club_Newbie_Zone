@@ -158,5 +158,5 @@ int run() {
   cout << ans;
 
 }
-
+return 0;
 }
